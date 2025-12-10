@@ -515,6 +515,11 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
                 <label>Gambar (URL)</label>
                 <input type="text" id="p_image" placeholder="https://example.com/image.jpg">
             </div>
+            <div class="form-group">
+                <label>Atau Unggah Gambar</label>
+                <input type="file" id="p_image_file" accept="image/*">
+                <div id="p_image_preview" style="margin-top:8px;"></div>
+            </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeProductModal()">Batal</button>
                 <button class="btn btn-primary" onclick="saveProduct()">Simpan</button>
@@ -702,6 +707,8 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
             document.getElementById('p_category').value = '';
             document.getElementById('p_unit').value = '';
             document.getElementById('p_image').value = '';
+            const fileEl = document.getElementById('p_image_file'); if (fileEl) fileEl.value = '';
+            const prev = document.getElementById('p_image_preview'); if (prev) prev.innerHTML = '';
             document.getElementById('productModal').classList.add('active');
         }
 
@@ -721,6 +728,8 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
             document.getElementById('p_category').value = p.category;
             document.getElementById('p_unit').value = p.unit;
             document.getElementById('p_image').value = p.image || '';
+            const fileEl2 = document.getElementById('p_image_file'); if (fileEl2) fileEl2.value = '';
+            const prev2 = document.getElementById('p_image_preview'); if (prev2) prev2.innerHTML = p.image ? `<img src="${p.image}" style="max-width:120px;border-radius:6px;">` : '';
             document.getElementById('productModal').classList.add('active');
         }
 
@@ -735,14 +744,49 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
                 unit: document.getElementById('p_unit').value || 'pcs',
                 image: document.getElementById('p_image').value || ''
             };
-            
+
+            // If a file is selected, upload it along with product data
+            const fileEl = document.getElementById('p_image_file');
+            if (fileEl && fileEl.files && fileEl.files[0]) {
+                const fd = new FormData();
+                fd.append('id', p.id);
+                fd.append('name', p.name);
+                fd.append('code', p.code);
+                fd.append('price', p.price);
+                fd.append('stock', p.stock);
+                fd.append('category', p.category);
+                fd.append('unit', p.unit);
+                // prefer file upload; leave 'image' empty so server uses uploaded file
+                fd.append('image_file', fileEl.files[0]);
+
+                fetch('api/products.php?action=create', { method: 'POST', body: fd })
+                    .then(r => r.json())
+                    .then(res => {
+                        if (res.ok) {
+                            p.image = res.image || p.image;
+                            if (adminState.editingId) {
+                                adminState.products = adminState.products.map(x => x.id === adminState.editingId ? p : x);
+                            } else {
+                                adminState.products.push(p);
+                            }
+                            closeProductModal();
+                            renderAll();
+                        } else {
+                            alert('Gagal menyimpan produk: ' + (res.msg || 'Unknown'));
+                        }
+                    })
+                    .catch(err => { console.error(err); alert('Error saat mengunggah gambar'); });
+                return;
+            }
+
+            // No file -> use existing flow (save URL or blank)
             if (adminState.editingId) {
                 adminState.products = adminState.products.map(x => x.id === adminState.editingId ? p : x);
             } else {
                 adminState.products.push(p);
             }
-            
-            // Persist single product immediately
+
+            // Persist single product immediately (uses image URL field)
             saveProductToDB(p);
             closeProductModal();
             renderAll();

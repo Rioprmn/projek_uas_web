@@ -33,6 +33,23 @@ try {
             exit;
         }
 
+        // Handle uploaded image file if present (field name: image_file)
+        if (!empty($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
+            $uploadsDir = __DIR__ . '/../uploads';
+            if (!is_dir($uploadsDir)) {
+                mkdir($uploadsDir, 0755, true);
+            }
+            $tmp = $_FILES['image_file']['tmp_name'];
+            $orig = basename($_FILES['image_file']['name']);
+            $ext = pathinfo($orig, PATHINFO_EXTENSION);
+            $nameFile = 'p_' . time() . '_' . bin2hex(random_bytes(6)) . ($ext ? '.' . $ext : '');
+            $dest = $uploadsDir . '/' . $nameFile;
+            if (move_uploaded_file($tmp, $dest)) {
+                // Save a web-relative path
+                $image = 'uploads/' . $nameFile;
+            }
+        }
+
         $stmt = $pdo->prepare("
             INSERT INTO `products` (id, name, code, price, stock, image, category, unit)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -42,7 +59,7 @@ try {
         $stmt->execute([$id, $name, $code, $price, $stock, $image, $category, $unit,
                        $name, $code, $price, $stock, $image, $category, $unit]);
 
-        echo json_encode(['ok' => true, 'msg' => 'Produk berhasil disimpan']);
+        echo json_encode(['ok' => true, 'msg' => 'Produk berhasil disimpan', 'image' => $image]);
         exit;
     }
 
