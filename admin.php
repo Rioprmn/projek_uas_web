@@ -343,7 +343,10 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
         <!-- ORDERS TAB -->
         <div id="orders" class="tab-content">
             <div class="page-header">
-                <h2>Pesanan Masuk</h2>
+                    <h2>Pesanan Masuk</h2>
+                    <div style="margin-left: 12px; display:inline-block">
+                        <button class="btn btn-danger" onclick="resetOrders()">Reset Pesanan</button>
+                    </div>
             </div>
 
             <div class="stats-grid">
@@ -371,6 +374,7 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
                             <th>Total</th>
                             <th>Jumlah Item</th>
                             <th>Tanggal</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -824,6 +828,8 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
                             totalSales += order.final_amount;
                             const row = document.createElement('tr');
                             const itemCount = order.items ? order.items.length : 0;
+                            const status = order.status || 'pending';
+                            const statusBadge = status === 'pending' ? `<span class="badge badge-warning">${status}</span>` : (status === 'completed' ? `<span class="badge badge-success">${status}</span>` : `<span class="badge">${status}</span>`);
                             row.innerHTML = `
                                 <td><strong>${order.order_number}</strong></td>
                                 <td>${order.customer_name}</td>
@@ -831,8 +837,11 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
                                 <td>Rp ${format(order.final_amount)}</td>
                                 <td>${itemCount} item</td>
                                 <td>${new Date(order.created_at).toLocaleString('id-ID')}</td>
+                                <td>${statusBadge}</td>
                                 <td>
                                     <button class="btn btn-primary btn-small" onclick="viewOrderDetail(${order.id})">Lihat</button>
+                                    <button class="btn btn-success btn-small" onclick="updateOrderStatus(${order.id}, 'completed')">Selesai</button>
+                                    <button class="btn btn-danger btn-small" onclick="updateOrderStatus(${order.id}, 'cancelled')">Batal</button>
                                 </td>
                             `;
                             table.appendChild(row);
@@ -873,6 +882,40 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
                     }
                 })
                 .catch(err => console.error(err));
+        }
+
+        function updateOrderStatus(orderId, status) {
+            if (!confirm('Ubah status pesanan ke "' + status + '"?')) return;
+            const fd = new FormData();
+            fd.append('id', orderId);
+            fd.append('status', status);
+
+            fetch('./api/orders.php?action=update_status', { method: 'POST', body: fd })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.ok) {
+                        renderOrders();
+                    } else {
+                        alert('Gagal mengubah status: ' + (data.msg || 'Unknown'));
+                    }
+                })
+                .catch(err => { console.error(err); alert('Error saat mengubah status'); });
+        }
+
+        function resetOrders() {
+            if (!confirm('Yakin ingin menghapus SEMUA pesanan dan item pesanan? Tindakan ini TIDAK bisa dikembalikan.')) return;
+            fetch('./api/orders.php?action=reset', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.ok) {
+                        alert('Semua pesanan berhasil dihapus');
+                        renderOrders();
+                        renderReports();
+                    } else {
+                        alert('Gagal mereset pesanan: ' + (data.msg || 'Unknown'));
+                    }
+                })
+                .catch(err => { console.error(err); alert('Error saat mereset pesanan'); });
         }
 
         function renderReports() {

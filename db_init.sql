@@ -48,6 +48,9 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `total_amount` INT NOT NULL DEFAULT 0,
   `discount` INT NOT NULL DEFAULT 0,
   `final_amount` INT NOT NULL DEFAULT 0,
+  `payment_method` VARCHAR(50) DEFAULT 'TUNAI',
+  `payment_proof` VARCHAR(255) DEFAULT NULL,
+  `payment_status` VARCHAR(20) DEFAULT 'unpaid',
   `status` VARCHAR(50) DEFAULT 'pending',
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

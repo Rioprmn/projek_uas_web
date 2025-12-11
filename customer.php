@@ -457,6 +457,13 @@ $role = $_SESSION['role'] ?? 'customer';
                     <label>Alamat Pengiriman *</label>
                     <textarea id="c_address" placeholder="Alamat lengkap untuk pengiriman" rows="3" required></textarea>
                 </div>
+                <div class="form-group">
+                    <label>Metode Pembayaran</label>
+                    <select id="payment_method" style="padding:10px;border:2px solid var(--border);border-radius:8px;width:100%;">
+                        <option value="TUNAI">Tunai (Bayar di tempat)</option>
+                        <option value="TRANSFER">Transfer (Upload bukti setelah pesan)</option>
+                    </select>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeCustomerModal()">Batal</button>
                     <button type="submit" class="btn btn-primary" style="background: var(--success);">Lanjutkan Pesanan</button>
@@ -474,6 +481,13 @@ $role = $_SESSION['role'] ?? 'customer';
             <div class="form-group">
                 <label>Nama / Catatan (opsional)</label>
                 <input type="text" id="p_name" placeholder="Nama atau catatan khusus">
+            </div>
+            <div class="form-group">
+                <label>Metode Pembayaran</label>
+                <select id="payment_method_pickup" style="padding:10px;border:2px solid var(--border);border-radius:8px;width:100%;">
+                    <option value="TUNAI">Tunai (Bayar di tempat)</option>
+                    <option value="TRANSFER">Transfer (Upload bukti setelah pesan)</option>
+                </select>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closePickupModal()">Batal</button>
@@ -493,6 +507,24 @@ $role = $_SESSION['role'] ?? 'customer';
         </div>
     </div>
 
+    <!-- Upload Proof Modal -->
+    <div id="uploadProofModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Upload Bukti Transfer</div>
+            <div class="form-group">
+                <input type="file" id="uploadProofInput" accept="image/*,application/pdf" />
+            </div>
+            <div class="form-group" id="uploadProofPreviewArea" style="display:none;">
+                <label>Preview:</label>
+                <div id="uploadProofPreview" style="margin-top:8px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeUploadModal()">Tutup</button>
+                <button class="btn btn-primary" onclick="uploadProof()">Upload</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const LS_KEY = 'pos_customer_v1';
         let state = {
@@ -500,7 +532,8 @@ $role = $_SESSION['role'] ?? 'customer';
             cart: [],
             kas: 0,
             mode: 'TUNAI',
-            lastOrder: null
+            lastOrder: null,
+            pendingUploadOrderId: null
         };
 
         function init() {
@@ -725,6 +758,8 @@ $role = $_SESSION['role'] ?? 'customer';
                 formData.append('customer_name', name);
                 formData.append('customer_phone', '-');
                 formData.append('customer_address', 'Pembeli Langsung (Tidak Diantar)');
+                const method = document.getElementById('payment_method_pickup') ? document.getElementById('payment_method_pickup').value : 'TUNAI';
+                formData.append('payment_method', method);
                 formData.append('items', JSON.stringify(state.cart));
                 formData.append('discount', 0);
 
@@ -745,10 +780,14 @@ $role = $_SESSION['role'] ?? 'customer';
                         items: state.cart,
                         total: result.total,
                         timestamp: new Date(),
+                        payment_method: method,
                         type: 'pickup'
                     };
                     saveState();
                     showReceipt();
+                    if (method === 'TRANSFER') {
+                        openUploadModal(result.order_id);
+                    }
                 } else {
                     alert('Gagal membuat pesanan: ' + result.msg);
                     closeReceiptModal();
@@ -789,6 +828,8 @@ $role = $_SESSION['role'] ?? 'customer';
                 formData.append('customer_name', name);
                 formData.append('customer_phone', phone);
                 formData.append('customer_address', address);
+                const method = document.getElementById('payment_method') ? document.getElementById('payment_method').value : 'TUNAI';
+                formData.append('payment_method', method);
                 formData.append('items', JSON.stringify(state.cart));
                 formData.append('discount', 0);
 
@@ -800,6 +841,7 @@ $role = $_SESSION['role'] ?? 'customer';
                 const result = await response.json();
 
                 if (result.ok) {
+                    const method = document.getElementById('payment_method') ? document.getElementById('payment_method').value : 'TUNAI';
                     state.lastOrder = {
                         order_number: result.order_number,
                         order_id: result.order_id,
@@ -808,10 +850,14 @@ $role = $_SESSION['role'] ?? 'customer';
                         customer_address: address,
                         items: state.cart,
                         total: result.total,
-                        timestamp: new Date()
+                        timestamp: new Date(),
+                        payment_method: method
                     };
                     saveState();
                     showReceipt();
+                    if (state.lastOrder.payment_method === 'TRANSFER') {
+                        openUploadModal(result.order_id);
+                    }
                 } else {
                     alert('Gagal membuat pesanan: ' + result.msg);
                     closeReceiptModal();
@@ -859,6 +905,77 @@ $role = $_SESSION['role'] ?? 'customer';
 
         function closeReceiptModal() {
             document.getElementById('receiptModal').classList.remove('active');
+        }
+
+        // Upload proof handlers
+        function openUploadModal(orderId) {
+            state.pendingUploadOrderId = orderId;
+            const inp = document.getElementById('uploadProofInput');
+            if (inp) inp.value = '';
+            const previewArea = document.getElementById('uploadProofPreviewArea');
+            if (previewArea) previewArea.style.display = 'none';
+            document.getElementById('uploadProofModal').classList.add('active');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadProofModal').classList.remove('active');
+            state.pendingUploadOrderId = null;
+        }
+
+        document.getElementById('uploadProofInput').addEventListener('change', function (ev) {
+            const file = ev.target.files[0];
+            const preview = document.getElementById('uploadProofPreview');
+            const area = document.getElementById('uploadProofPreviewArea');
+            if (!file) {
+                if (area) area.style.display = 'none';
+                if (preview) preview.innerHTML = '';
+                return;
+            }
+            if (file.type.startsWith('image/')) {
+                const url = URL.createObjectURL(file);
+                preview.innerHTML = `<img src="${url}" style="max-width:100%;height:auto;border-radius:6px;" />`;
+                if (area) area.style.display = 'block';
+            } else {
+                preview.innerHTML = `<div style="padding:8px;border:1px solid var(--border);border-radius:6px;">${file.name}</div>`;
+                if (area) area.style.display = 'block';
+            }
+        });
+
+        async function uploadProof() {
+            if (!state.pendingUploadOrderId) {
+                alert('Tidak ada pesanan untuk diupload.');
+                return;
+            }
+            const inp = document.getElementById('uploadProofInput');
+            if (!inp || !inp.files || inp.files.length === 0) {
+                alert('Pilih file bukti transfer terlebih dahulu.');
+                return;
+            }
+            const file = inp.files[0];
+            const formData = new FormData();
+            formData.append('action', 'upload_proof');
+            formData.append('id', state.pendingUploadOrderId);
+            formData.append('payment_proof', file);
+
+            try {
+                const resp = await fetch('./api/orders.php', { method: 'POST', body: formData });
+                const res = await resp.json();
+                if (res.ok) {
+                    alert('Bukti transfer berhasil diunggah. Terima kasih.');
+                    // update local state
+                    if (state.lastOrder && state.lastOrder.order_id == state.pendingUploadOrderId) {
+                        state.lastOrder.payment_status = 'pending';
+                        state.lastOrder.payment_proof = res.payment_proof || null;
+                    }
+                    saveState();
+                    closeUploadModal();
+                } else {
+                    alert('Gagal mengunggah bukti: ' + (res.msg || 'unknown'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error saat mengunggah: ' + err.message);
+            }
         }
 
         function printReceipt() {
