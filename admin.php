@@ -374,8 +374,12 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
                             <th>Total</th>
                             <th>Jumlah Item</th>
                             <th>Tanggal</th>
+                            <th>Metode Pembayaran</th>
                             <th>Status</th>
-                            <th>Aksi</th>
+                            <th>Bukti TF</th>
+                            <th>Pesanan</th>
+                            <th>Konfirmasi</th>
+                            <th>Batal</th>
                         </tr>
                     </thead>
                     <tbody id="ordersTable"></tbody>
@@ -527,6 +531,21 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeProductModal()">Batal</button>
                 <button class="btn btn-primary" onclick="saveProduct()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Payment Proof Modal -->
+    <div id="proofModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">Bukti Pembayaran Transfer</div>
+            <div style="margin: 20px 0;">
+                <p id="proofOrderInfo" style="margin: 0 0 12px 0; color: var(--text-muted); font-size: 14px;"></p>
+                <div id="proofPreview" style="text-align: center; min-height: 200px; background: #f5f5f5; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: auto;"></div>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="btn btn-primary" id="confirmPaymentBtn" onclick="confirmPayment()" style="flex: 1;">✓ Konfirmasi Pembayaran</button>
+                <button class="btn btn-outline" onclick="closeProofModal()" style="flex: 1;">Tutup</button>
             </div>
         </div>
     </div>
@@ -837,10 +856,18 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
                                 <td>Rp ${format(order.final_amount)}</td>
                                 <td>${itemCount} item</td>
                                 <td>${new Date(order.created_at).toLocaleString('id-ID')}</td>
+                                <td>${order.payment_method || 'TUNAI'}</td>
                                 <td>${statusBadge}</td>
                                 <td>
+                                    ${order.payment_proof ? `<button class="btn btn-primary btn-small" onclick="viewProof(${order.id}, '${order.payment_proof}', '${order.order_number}')">Lihat</button>` : '-'}
+                                </td>
+                                <td>
                                     <button class="btn btn-primary btn-small" onclick="viewOrderDetail(${order.id})">Lihat</button>
+                                </td>
+                                <td>
                                     <button class="btn btn-success btn-small" onclick="updateOrderStatus(${order.id}, 'completed')">Selesai</button>
+                                </td>
+                                <td>
                                     <button class="btn btn-danger btn-small" onclick="updateOrderStatus(${order.id}, 'cancelled')">Batal</button>
                                 </td>
                             `;
@@ -853,7 +880,7 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
                         document.getElementById('totalSales').innerText = 'Rp ' + format(totalSales);
                         document.getElementById('avgOrder').innerText = 'Rp ' + format(avgOrder);
                     } else {
-                        table.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Belum ada pesanan</td></tr>';
+                        table.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--text-muted);">Belum ada pesanan</td></tr>';
                     }
                 })
                 .catch(err => {
@@ -900,6 +927,55 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
                     }
                 })
                 .catch(err => { console.error(err); alert('Error saat mengubah status'); });
+        }
+
+        let currentProofOrderId = null;
+
+        function viewProof(orderId, proofPath, orderNumber) {
+            currentProofOrderId = orderId;
+            const preview = document.getElementById('proofPreview');
+            const info = document.getElementById('proofOrderInfo');
+            info.innerText = 'Pesanan: ' + orderNumber + ' | Path: ' + proofPath;
+            
+            const ext = proofPath.toLowerCase().split('.').pop();
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+                preview.innerHTML = `<img src="${proofPath}" style="max-width: 100%; max-height: 400px; border-radius: 6px;">`;
+            } else if (ext === 'pdf') {
+                preview.innerHTML = `<iframe src="${proofPath}" style="width: 100%; height: 400px; border: none; border-radius: 6px;"></iframe>`;
+            } else {
+                preview.innerHTML = `<div style="padding: 20px; text-align: center;"><p>File: ${proofPath}</p><a href="${proofPath}" target="_blank" class="btn btn-primary">Buka File</a></div>`;
+            }
+            
+            document.getElementById('proofModal').classList.add('active');
+        }
+
+        function closeProofModal() {
+            document.getElementById('proofModal').classList.remove('active');
+            currentProofOrderId = null;
+        }
+
+        function confirmPayment() {
+            if (!currentProofOrderId) {
+                alert('Pesanan tidak ditemukan');
+                return;
+            }
+            if (!confirm('Konfirmasi pembayaran untuk pesanan ini?')) return;
+
+            const fd = new FormData();
+            fd.append('id', currentProofOrderId);
+
+            fetch('./api/orders.php?action=confirm_payment', { method: 'POST', body: fd })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.ok) {
+                        alert('Pembayaran berhasil dikonfirmasi');
+                        closeProofModal();
+                        renderOrders();
+                    } else {
+                        alert('Gagal mengonfirmasi pembayaran: ' + (data.msg || 'Unknown'));
+                    }
+                })
+                .catch(err => { console.error(err); alert('Error saat mengonfirmasi pembayaran'); });
         }
 
         function resetOrders() {

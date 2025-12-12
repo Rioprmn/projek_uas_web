@@ -2,6 +2,14 @@
 session_start();
 // Customer interface - allow access without auth
 $role = $_SESSION['role'] ?? 'customer';
+// Redirect customers to dashboard landing by default. Use ?view=shop to open shop directly.
+if (($role ?? 'customer') !== 'admin') {
+    $view = $_GET['view'] ?? '';
+    if ($view !== 'shop') {
+        header('Location: dashboard.php');
+        exit;
+    }
+}
 ?>
 <!doctype html>
 <html lang="id">
@@ -25,6 +33,32 @@ $role = $_SESSION['role'] ?? 'customer';
             --text-muted: #666666;
             --border: #e0e0e0;
         }
+        /* Dashboard hero */
+        .hero {
+            background: linear-gradient(90deg,#1e824c,#2ecc71);
+            color: white;
+            border-radius: 14px;
+            padding: 28px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+        .hero .hero-left { flex: 1; }
+        .hero h3 { margin: 0 0 8px 0; font-size: 28px; }
+        .hero p { margin: 0 0 12px 0; color: rgba(255,255,255,0.9); }
+        .hero .hero-cta { padding: 10px 16px; border-radius: 10px; background: #ffd166; color: #0b3a2a; font-weight:700; border:none; cursor:pointer; }
+        .hero img { width: 280px; height: 120px; object-fit:cover; border-radius:10px; }
+
+        .categories {
+            display:flex; gap:12px; overflow:auto; padding:10px 0; margin-bottom:20px;
+        }
+        .cat-card {
+            min-width:140px; background:var(--card); border-radius:10px; padding:12px; box-shadow:0 6px 18px rgba(0,0,0,0.06); display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer;
+        }
+        .cat-card img{width:56px;height:56px}
+        .cat-card .cat-name{font-weight:700;color:var(--text);font-size:13px}
         * {
             box-sizing: border-box;
             font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial;
@@ -398,7 +432,26 @@ $role = $_SESSION['role'] ?? 'customer';
             <p style="color: var(--text-muted); margin: 8px 0 0 0;">Pilih produk dan lakukan pemesanan</p>
         </div>
 
+        <!-- Dashboard Hero -->
+        <div id="dashboardHero" class="hero">
+            <div class="hero-left">
+                <h3>Stok Warung Habis? <br><span style="color:#fff7c2;">Restock Cepat di Sini.</span></h3>
+                <p>Harga khusus mitra. Pesan sekarang, kirim besok pagi.</p>
+                <button class="hero-cta" onclick="gotoShop()">Buat Pesanan Baru</button>
+            </div>
+            <div class="hero-right">
+                <img src="https://images.unsplash.com/photo-1542831371-d531d36971e6?w=800&q=60&fit=crop&auto=format" alt="banner">
+            </div>
+        </div>
+
+        <!-- Category Row -->
+        <div class="categories" id="categoryRow"></div>
+
         <div class="search-bar">
+            <div id="selectedCategoryPill" style="display:none; margin-right:8px; align-items:center;">
+                <span id="selectedCategoryName" style="background:var(--accent); color:#111; padding:6px 10px; border-radius:20px; margin-right:6px;"></span>
+                <button class="btn-clear" style="padding:6px 8px;" onclick="clearCategory()">Hapus</button>
+            </div>
             <input type="text" id="globalSearch" placeholder="Cari produk..." />
         </div>
 
@@ -452,6 +505,13 @@ $role = $_SESSION['role'] ?? 'customer';
                 <div class="form-group">
                     <label>Nomor Telepon *</label>
                     <input type="tel" id="c_phone" placeholder="08xxxxxxxxxx" required>
+                </div>
+                <div class="from-grup">
+                    <label >Transfer Ke </label>
+                    <select id="bank_account" style="padding:10px;border:2px solid var(--border);border-radius:8px;width:100%;">
+                        <option value="BCA - 1234567890 a/n POS Warung">BCA - 1234567890 a/n POS Warung</option>
+                        <option value="MANDIRI - 0987654321 a/n POS Warung">MANDIRI - 0987654321 a/n POS Warung</option>
+                        <option value="OVO - 081234567890 a/n POS Warung">OVO - 081234567890 a/n POS Warung</option>
                 </div>
                 <div class="form-group">
                     <label>Alamat Pengiriman *</label>
@@ -533,8 +593,53 @@ $role = $_SESSION['role'] ?? 'customer';
             kas: 0,
             mode: 'TUNAI',
             lastOrder: null,
-            pendingUploadOrderId: null
+            pendingUploadOrderId: null,
+            selectedCategory: null
         };
+
+        // sample categories to render in dashboard
+        const categories = [
+            {id:1, name: 'Sembako', icon: 'https://img.icons8.com/fluency/96/000000/groceries.png'},
+            {id:2, name: 'Minuman', icon: 'https://img.icons8.com/fluency/96/000000/water-bottle.png'},
+            {id:3, name: 'Bumbu Dapur', icon: 'https://img.icons8.com/fluency/96/000000/seasoning.png'},
+            {id:4, name: 'Perlengkapan', icon: 'https://img.icons8.com/fluency/96/000000/broom.png'},
+            {id:5, name: 'Gas & Galon', icon: 'https://img.icons8.com/fluency/96/000000/gas-pump.png'}
+        ];
+
+        function renderCategories(){
+            const el = document.getElementById('categoryRow');
+            if (!el) return;
+            el.innerHTML = '';
+            categories.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'cat-card';
+                card.innerHTML = `<img src="${c.icon}" alt="${c.name}" /><div class="cat-name">${c.name}</div>`;
+                card.addEventListener('click', ()=>{
+                    // set selected category and render
+                    state.selectedCategory = c.name;
+                    document.getElementById('selectedCategoryName').innerText = c.name;
+                    document.getElementById('selectedCategoryPill').style.display = 'flex';
+                    document.getElementById('globalSearch').value = '';
+                    renderProducts();
+                    window.scrollTo({top: document.getElementById('productGrid').offsetTop - 80, behavior:'smooth'});
+                });
+                el.appendChild(card);
+            });
+        }
+
+        function clearCategory(){
+            state.selectedCategory = null;
+            document.getElementById('selectedCategoryPill').style.display = 'none';
+            document.getElementById('selectedCategoryName').innerText = '';
+            renderProducts();
+        }
+
+        function gotoShop(){
+            // hide dashboard hero and scroll to products
+            const hero = document.getElementById('dashboardHero');
+            if (hero) hero.scrollIntoView({behavior:'smooth'});
+            document.getElementById('globalSearch').focus();
+        }
 
         function init() {
             // Load products from database
@@ -565,6 +670,18 @@ $role = $_SESSION['role'] ?? 'customer';
                         ];
                     }
                     renderAll();
+                    renderCategories();
+                    // If a category is provided via URL (?cat=...), apply it
+                    try {
+                        const params = new URLSearchParams(window.location.search);
+                        const cat = params.get('cat');
+                        if (cat) {
+                            state.selectedCategory = decodeURIComponent(cat);
+                            document.getElementById('selectedCategoryName').innerText = state.selectedCategory;
+                            document.getElementById('selectedCategoryPill').style.display = 'flex';
+                            renderProducts();
+                        }
+                    } catch(e) { /* ignore URL errors */ }
                 })
                 .catch(err => {
                     console.error('Error loading products:', err);
@@ -583,6 +700,7 @@ $role = $_SESSION['role'] ?? 'customer';
         function saveState() {
             localStorage.setItem(LS_KEY, JSON.stringify(state));
             renderAll();
+            renderCategories();
         }
 
         function format(n) {
@@ -594,9 +712,11 @@ $role = $_SESSION['role'] ?? 'customer';
             const container = document.getElementById('productGrid');
             container.innerHTML = '';
             
-            const list = state.products.filter(p => 
-                p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q)
-            );
+            const list = state.products.filter(p => {
+                const matchesQuery = q === '' || p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q);
+                const matchesCategory = !state.selectedCategory || (p.category && p.category.toLowerCase() === state.selectedCategory.toLowerCase());
+                return matchesQuery && matchesCategory;
+            });
 
             list.forEach(p => {
                 const el = document.createElement('div');
