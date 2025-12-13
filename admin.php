@@ -529,7 +529,7 @@ if (($_SESSION['role'] ?? null) !== 'admin') {
                 <div id="p_image_preview" style="margin-top:8px;"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeProductModal()">Batal</button>
+                <button class="btn btn-primary" onclick="closeProductModal()">Batal</button>
                 <button class="btn btn-primary" onclick="saveProduct()">Simpan</button>
             </div>
         </div>

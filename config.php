@@ -6,8 +6,8 @@ define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'pos_warung');
 // Simple admin credential for demo purposes (change in production)
-define('ADMIN_USER', 'admin');
-define('ADMIN_PASS', 'admin123');
+define('ADMIN_USER', 'Admin_petshop');
+define('ADMIN_PASS', 'petshop!23>');
 
 function getPDO($withDB = true){
     $dsn = 'mysql:host=' . DB_HOST . ($withDB ? ';dbname=' . DB_NAME : '') . ';charset=utf8mb4';

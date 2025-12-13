@@ -550,7 +550,7 @@ if (($role ?? 'customer') !== 'admin') {
         <div style="display:flex;gap:12px;align-items:center">
             <a href="dashboard.php" class="btn btn-primary" style="background:#4caf50;color:white;font-weight:600">🏠 Dashboard</a>
             <button onclick="showLocationModal()" class="btn" style="background:#ff9800;color:white;font-weight:600;border:1px solid #f57c00">📍 Lokasi Toko</button>
-            <a href="https://wa.me/6281234567890?text=Halo%20Admin%2C%20saya%20ingin%20konfirmasi%20estimasi%20pesanan%20saya" class="btn btn-whatsapp" style="background:#25d366;color:white;font-weight:600" target="_blank">💬 WhatsApp</a>
+            <a href="https://wa.me/62895339174123?text=Halo%20Admin%2C%20saya%20ingin%20konfirmasi%20estimasi%20pesanan%20saya" class="btn btn-whatsapp" style="background:#25d366;color:white;font-weight:600" target="_blank">💬 Hubungi via WhatsApp</a>
             <a href="login.php" class="btn" style="background:#81c784;color:#2e7d32;border:1px solid #4caf50">Login Admin</a>
         </div>
     </div>

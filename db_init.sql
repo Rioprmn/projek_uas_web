@@ -1,5 +1,4 @@
--- SQL script to create database and tables for POS Warung
--- Run via phpMyAdmin or the included init_db.php
+
 
 CREATE DATABASE IF NOT EXISTS `pos_warung` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `pos_warung`;
