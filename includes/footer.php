@@ -55,12 +55,12 @@
       if(saved){ state = JSON.parse(saved); }
       if(state.products.length===0) {
         state.products = [
-          {id:1,name:'Beras 5kg',code:'BR05',price:65000,stock:20,category:'Beras',unit:'pack'},
-          {id:2,name:'Gula 1kg',code:'GL01',price:15000,stock:50,category:'Bumbu',unit:'pack'},
-          {id:3,name:'Minyak 2L',code:'MK02',price:30000,stock:30,category:'Minyak',unit:'botol'},
-          {id:4,name:'Sarden Kaleng',code:'SD01',price:12000,stock:60,category:'Makanan',unit:'pcs'},
-          {id:5,name:'Rokok A',code:'RK01',price:20000,stock:80,category:'Rokok',unit:'pcs'},
-          {id:6,name:'Kopi 250g',code:'KP25',price:22000,stock:40,category:'Minuman',unit:'pack'}
+          {id:1,name:'Royal Canin Kitten 1kg',code:'RC01',price:85000,stock:15,category:'Makanan Kucing',unit:'pack'},
+          {id:2,name:'Pedigree Adult 1kg',code:'PD01',price:65000,stock:25,category:'Makanan Anjing',unit:'pack'},
+          {id:3,name:'Tetra Fish Food 100g',code:'TF01',price:25000,stock:40,category:'Makanan Ikan',unit:'pack'},
+          {id:4,name:'Canary Seed Mix 500g',code:'CS01',price:35000,stock:30,category:'Makanan Burung',unit:'pack'},
+          {id:5,name:'Pet Collar Size M',code:'PC01',price:45000,stock:20,category:'Aksesoris Hewan',unit:'pcs'},
+          {id:6,name:'Pet Vitamins 60 tablets',code:'PV01',price:75000,stock:35,category:'Vitamin & Obat',unit:'botol'}
         ];
       }
       renderAll();

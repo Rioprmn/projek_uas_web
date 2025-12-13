@@ -16,7 +16,7 @@ if (($role ?? 'customer') !== 'admin') {
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>POS Warung - Customer</title>
+    <title>Pet Shop - Customer</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -83,22 +83,6 @@ if (($role ?? 'customer') !== 'admin') {
             font-weight: 400;
             animation: slideInLeft 1s ease-out 0.2s both;
         }
-        .hero .hero-cta {
-            padding: 16px 32px;
-            border-radius: 12px;
-            background: #66bb6a;
-            color: white;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            font-size: 16px;
-            animation: slideInLeft 1s ease-out 0.4s both;
-        }
-        .hero .hero-cta:hover {
-            transform: scale(1.08);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        }
         .hero img {
             width: 400px;
             height: 200px;
@@ -138,6 +122,20 @@ if (($role ?? 'customer') !== 'admin') {
             transition:transform 0.3s ease;
         }
         .cat-card:hover img{
+            transform:scale(1.1);
+        }
+        .icon-container{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            width:64px;
+            height:64px;
+            font-size:32px;
+            border-radius:12px;
+            background:rgba(76,175,80,0.1);
+            transition:transform 0.3s ease;
+        }
+        .cat-card:hover .icon-container{
             transform:scale(1.1);
         }
         .cat-card .cat-name{
@@ -226,6 +224,11 @@ if (($role ?? 'customer') !== 'admin') {
             background: var(--accent-light);
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(76, 175, 80, 0.3);
+        }
+        .btn-whatsapp:hover {
+            background: #128c7e !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 211, 102, 0.3);
         }
         .btn-outline {
             background: transparent;
@@ -543,9 +546,11 @@ if (($role ?? 'customer') !== 'admin') {
 </head>
 <body>
     <div class="navbar">
-        <div style="display:flex;align-items:center;gap:12px"><strong style="color:#2e7d32">🛒 POS Warung - Customer</strong></div>
+        <div style="display:flex;align-items:center;gap:12px"><strong style="color:#2e7d32">🛒 Pet Shop</strong></div>
         <div style="display:flex;gap:12px;align-items:center">
             <a href="dashboard.php" class="btn btn-primary" style="background:#4caf50;color:white;font-weight:600">🏠 Dashboard</a>
+            <button onclick="showLocationModal()" class="btn" style="background:#ff9800;color:white;font-weight:600;border:1px solid #f57c00">📍 Lokasi Toko</button>
+            <a href="https://wa.me/6281234567890?text=Halo%20Admin%2C%20saya%20ingin%20konfirmasi%20estimasi%20pesanan%20saya" class="btn btn-whatsapp" style="background:#25d366;color:white;font-weight:600" target="_blank">💬 WhatsApp</a>
             <a href="login.php" class="btn" style="background:#81c784;color:#2e7d32;border:1px solid #4caf50">Login Admin</a>
         </div>
     </div>
@@ -563,16 +568,17 @@ if (($role ?? 'customer') !== 'admin') {
 
     <div class="container">
         <div class="page-header">
-            <h2>Selamat Datang di POS Warung</h2>
+            <h2>Selamat Datang di Pet Shop</h2>
             <p style="color: var(--text-muted); margin: 8px 0 0 0;">Pilih produk dan lakukan pemesanan</p>
         </div>
 
         <!-- Dashboard Hero -->
         <div id="dashboardHero" class="hero">
             <div class="hero-left">
-                <h3>Stok Warung Habis? <br><span style="color:#fff7c2;">Restock Cepat di Sini.</span></h3>
-                <p>Harga khusus mitra. Pesan sekarang, kirim besok pagi.</p>
-                <button class="hero-cta" onclick="gotoShop()">Buat Pesanan Baru</button>
+                <h3>Sayangi Hewan Anda dengan Produk Terbaik. <br>
+                <span style="color:#fff7c2;">Mulai Belanja Sekarang</span>
+                </h3>
+                <p>Layanan cepat, responsif, dan aman.</p>
             </div>
         </div>
 
@@ -652,9 +658,9 @@ if (($role ?? 'customer') !== 'admin') {
                 <div class="form-group">
                     <label>Transfer Ke</label>
                     <P>
-                        Rekening BCA 123-456-7890 POS WARUNG <br>
-                        Rekening MANDIRI 987-654-3210 POS WARUNG <br>
-                        Rekening OVO 0812-3456-7890 POS WARUNG
+                        Rekening BCA 123-456-7890 Pet Shop <br>
+                        Rekening MANDIRI 987-654-3210 Pet Shop <br>
+                        Rekening OVO 0812-3456-7890 Pet Shop
                     </P>
                 </div>
                 <div class="modal-footer">
@@ -718,6 +724,50 @@ if (($role ?? 'customer') !== 'admin') {
         </div>
     </div>
 
+    <!-- Location Modal -->
+    <div id="locationModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">📍 Lokasi Toko Pet Shop</div>
+            <div style="padding: 20px;">
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: var(--primary); margin-bottom: 10px;">Alamat Toko:</h3>
+                    <p style="margin: 0; color: var(--text);">
+                        <strong> Pet Shop</strong><br>
+                        548 Jl. Raya Ciwidey<br>
+                        Pasirjambu, Jawa Barat<br><br>
+                        <strong>Jam Operasional:</strong><br>
+                        Senin - Minggu: 08:00 - 20:00 WIB<br><br>
+                        <strong>Kontak:</strong><br>
+                        📞 (021) 1234-5678<br>
+                        📱 +62 812-3456-7890
+                    </p>
+                </div>
+                <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.5!2d107.35!3d-7.08!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68c8b8b8b8b8b8b%3A0x1234567890abcdef!2s548%20Jl.%20Raya%20Ciwidey%2C%20Pasirjambu%2C%20Jawa%20Barat!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid" 
+                        width="100%" 
+                        height="300" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+                <div style="margin-top: 15px; text-align: center;">
+                    <a href="https://maps.google.com/?q=Jalan+Raya+Bogor+KM+28,+Cibinong,+Bogor,+Jawa+Barat,+Indonesia" 
+                       target="_blank" 
+                       class="btn btn-primary" 
+                       style="background: var(--primary); display: inline-block; padding: 10px 20px; text-decoration: none;">
+                        🗺️ Buka di Google Maps
+                    </a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeLocationModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const LS_KEY = 'pos_customer_v1';
         let state = {
@@ -733,10 +783,16 @@ if (($role ?? 'customer') !== 'admin') {
         // sample categories to render in dashboard
         
         const categories = [
-            {id:1, name: 'Sembako', icon: 'https://img.icons8.com/fluency/96/000000/groceries.png'},
-            {id:2, name: 'Minuman', icon: 'https://img.icons8.com/fluency/96/000000/water-bottle.png'},
-            {id:3, name: 'Bumbu', icon: 'https://img.icons8.com/fluency/96/000000/seasoning.png'},
-            {id:4, name: 'Gas', icon: 'https://img.icons8.com/fluency/96/000000/gas-pump.png'}
+            {id:1, name: 'Makanan Kucing', icon: 'https://img.icons8.com/color/96/000000/cat.png', fallback: '🐱'},
+            {id:2, name: 'Makanan Anjing', icon: 'https://img.icons8.com/color/96/000000/dog.png', fallback: '🐶'},
+            {id:3, name: 'Makanan Ikan', icon: 'https://img.icons8.com/color/96/000000/fish.png', fallback: '🐠'},
+            {id:4, name: 'Makanan Burung', icon: 'https://img.icons8.com/color/96/000000/bird.png', fallback: '🐦'},
+            {id:5, name: 'Aksesoris Hewan', icon: 'https://img.icons8.com/color/96/000000/dog-leash.png', fallback: '🦮'},
+            {id:6, name: 'Vitamin & Obat', icon: 'https://img.icons8.com/color/96/000000/pill.png', fallback: '💊'},
+            {id:7, name: 'Perawatan Hewan', icon: 'https://img.icons8.com/color/96/000000/scissors.png', fallback: '✂️'},
+            {id:8, name: 'Kandang & Peralatan', icon: 'https://img.icons8.com/color/96/000000/cage.png', fallback: '🏠'},
+            {id:9, name: 'Mainan Hewan', icon: 'https://img.icons8.com/color/96/000000/dog-toy.png', fallback: '🧸'},
+            {id:10, name: 'Snack Hewan', icon: 'https://img.icons8.com/color/96/000000/dog-bone.png', fallback: '🦴'}
         ];
 
         function renderCategories(){
@@ -746,7 +802,7 @@ if (($role ?? 'customer') !== 'admin') {
             categories.forEach((c, index)=>{
                 const card = document.createElement('div');
                 card.className = 'cat-card';
-                card.innerHTML = `<img src="${c.icon}" alt="${c.name}" /><div class="cat-name">${c.name}</div>`;
+                card.innerHTML = `<div class="icon-container"><img src="${c.icon}" alt="${c.name}" onerror="this.parentElement.innerHTML='${c.fallback}';" /></div><div class="cat-name">${c.name}</div>`;
                 card.style.animationDelay = `${index * 0.1}s`;
                 card.addEventListener('click', ()=>{
                     // set selected category and render
@@ -795,12 +851,12 @@ if (($role ?? 'customer') !== 'admin') {
                     } else {
                         // Fallback to default products
                         state.products = [
-                            {id:1, name:'Beras 5kg', code:'BR05', price:65000, stock:20, category:'Beras', unit:'pack'},
-                            {id:2, name:'Gula 1kg', code:'GL01', price:15000, stock:50, category:'Bumbu', unit:'pack'},
-                            {id:3, name:'Minyak 2L', code:'MK02', price:30000, stock:30, category:'Minyak', unit:'botol'},
-                            {id:4, name:'Sarden Kaleng', code:'SD01', price:12000, stock:60, category:'Makanan', unit:'pcs'},
-                            {id:5, name:'Rokok A', code:'RK01', price:20000, stock:80, category:'Rokok', unit:'pcs'},
-                            {id:6, name:'Kopi 250g', code:'KP25', price:22000, stock:40, category:'Minuman', unit:'pack'}
+                            {id:1, name:'Royal Canin Kitten 1kg', code:'RC01', price:85000, stock:15, category:'Makanan Kucing', unit:'pack'},
+                            {id:2, name:'Pedigree Adult 1kg', code:'PD01', price:65000, stock:25, category:'Makanan Anjing', unit:'pack'},
+                            {id:3, name:'Tetra Fish Food 100g', code:'TF01', price:25000, stock:40, category:'Makanan Ikan', unit:'pack'},
+                            {id:4, name:'Canary Seed Mix 500g', code:'CS01', price:35000, stock:30, category:'Makanan Burung', unit:'pack'},
+                            {id:5, name:'Pet Collar Size M', code:'PC01', price:45000, stock:20, category:'Aksesoris Hewan', unit:'pcs'},
+                            {id:6, name:'Pet Vitamins 60 tablets', code:'PV01', price:75000, stock:35, category:'Vitamin & Obat', unit:'botol'}
                         ];
                     }
                     renderAll();
@@ -820,12 +876,12 @@ if (($role ?? 'customer') !== 'admin') {
                 .catch(err => {
                     console.error('Error loading products:', err);
                     state.products = [
-                        {id:1, name:'Beras 5kg', code:'BR05', price:65000, stock:20, category:'Beras', unit:'pack'},
-                        {id:2, name:'Gula 1kg', code:'GL01', price:15000, stock:50, category:'Bumbu', unit:'pack'},
-                        {id:3, name:'Minyak 2L', code:'MK02', price:30000, stock:30, category:'Minyak', unit:'botol'},
-                        {id:4, name:'Sarden Kaleng', code:'SD01', price:12000, stock:60, category:'Makanan', unit:'pcs'},
-                        {id:5, name:'Rokok A', code:'RK01', price:20000, stock:80, category:'Rokok', unit:'pcs'},
-                        {id:6, name:'Kopi 250g', code:'KP25', price:22000, stock:40, category:'Minuman', unit:'pack'}
+                        {id:1, name:'Royal Canin Kitten 1kg', code:'RC01', price:85000, stock:15, category:'Makanan Kucing', unit:'pack'},
+                        {id:2, name:'Pedigree Adult 1kg', code:'PD01', price:65000, stock:25, category:'Makanan Anjing', unit:'pack'},
+                        {id:3, name:'Tetra Fish Food 100g', code:'TF01', price:25000, stock:40, category:'Makanan Ikan', unit:'pack'},
+                        {id:4, name:'Canary Seed Mix 500g', code:'CS01', price:35000, stock:30, category:'Makanan Burung', unit:'pack'},
+                        {id:5, name:'Pet Collar Size M', code:'PC01', price:45000, stock:20, category:'Aksesoris Hewan', unit:'pcs'},
+                        {id:6, name:'Pet Vitamins 60 tablets', code:'PV01', price:75000, stock:35, category:'Vitamin & Obat', unit:'botol'}
                     ];
                     renderAll();
                 });
@@ -1153,7 +1209,7 @@ if (($role ?? 'customer') !== 'admin') {
             html += '<div class="receipt-total">Total: Rp ' + format(order.total) + '</div><br>';
             html += '<strong>KETERANGAN</strong><br>';
             html += '<p>BARANG YG SUDAH DI PESAN, JIKA KELALAIAN BUKAN DARI PIHAK KAMI MAKA TIDAK BISA DI KEMBALIKAN <br> JANGAN LUPA SERTAKAN BUKTI</p>';
-            html += '<p style="font-size: 13px;">Terima kasih telah berbelanja di POS Warung</p>';
+            html += '<p style="font-size: 13px;">Terima kasih telah berbelanja di Pet Shop</p>';
             html += '</div>';
 
             document.getElementById('receiptContent').innerHTML = html;
@@ -1176,6 +1232,14 @@ if (($role ?? 'customer') !== 'admin') {
         function closeUploadModal() {
             document.getElementById('uploadProofModal').classList.remove('active');
             state.pendingUploadOrderId = null;
+        }
+
+        function showLocationModal() {
+            document.getElementById('locationModal').classList.add('active');
+        }
+
+        function closeLocationModal() {
+            document.getElementById('locationModal').classList.remove('active');
         }
 
         document.getElementById('uploadProofInput').addEventListener('change', function (ev) {
@@ -1240,7 +1304,7 @@ if (($role ?? 'customer') !== 'admin') {
 
             let html = '<html><head><title>Nota Pembelian</title></head><body>';
             html += '<pre style="font-family: monospace; text-align: center;">';
-            html += '==== POS WARUNG ====\n';
+            html += '==== Pet Shop ====\n';
             html += 'Nota No: ' + order.order_number + '\n';
             html += new Date(order.timestamp).toLocaleString('id-ID') + '\n\n';
             html += '--- DATA PEMESAN ---\n';

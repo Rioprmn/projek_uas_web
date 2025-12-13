@@ -202,8 +202,8 @@ if (isset($_SESSION['role'])) {
 <body>
     <div class="login-container">
         <div class="logo-section">
-            <div class="logo">PW</div>
-            <h1>POS Warung</h1>
+            <div class="logo">PS</div>
+            <h1>Pet Shop</h1>
             <div class="subtitle">Login ke Sistem</div>
         </div>
 

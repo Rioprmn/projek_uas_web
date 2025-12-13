@@ -84,9 +84,9 @@ CREATE TABLE IF NOT EXISTS `monthly_reports` (
 
 -- sample products
 INSERT INTO `products` (`id`,`name`,`code`,`price`,`stock`,`image`,`category`,`unit`) VALUES
-(1,'Beras 5kg','BR05',65000,20,NULL,'Beras','pack'),
-(2,'Gula 1kg','GL01',15000,50,NULL,'Bumbu','pack'),
-(3,'Minyak 2L','MK02',30000,30,NULL,'Minyak','botol'),
-(4,'Sarden Kaleng','SD01',12000,60,NULL,'Makanan','pcs'),
-(5,'Rokok A','RK01',20000,80,NULL,'Rokok','pcs'),
-(6,'Kopi 250g','KP25',22000,40,NULL,'Minuman','pack');
+(1,'Royal Canin Kitten 1kg','RC01',85000,15,NULL,'Makanan Kucing','pack'),
+(2,'Pedigree Adult 1kg','PD01',65000,25,NULL,'Makanan Anjing','pack'),
+(3,'Tetra Fish Food 100g','TF01',25000,40,NULL,'Makanan Ikan','pack'),
+(4,'Canary Seed Mix 500g','CS01',35000,30,NULL,'Makanan Burung','pack'),
+(5,'Pet Collar Size M','PC01',45000,20,NULL,'Aksesoris Hewan','pcs'),
+(6,'Pet Vitamins 60 tablets','PV01',75000,35,NULL,'Vitamin & Obat','botol');

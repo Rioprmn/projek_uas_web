@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 // Header include: contains the document head and sidebar
 ?>
 <!doctype html>
@@ -6,7 +6,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>POS Warung & Grosir — Prototype</title>
+  <title>Pet Shop </title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -95,4 +95,4 @@
           <button class="btn ghost" onclick="clearData()">Reset</button>
           <button id="authBtn" class="btn ghost" onclick="openLogin()">Login Admin</button>
         </div>
-      </div>
+      </div> -->
