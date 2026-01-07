@@ -1,10 +1,10 @@
-# 🐾 Kasir-Ku: Pet Information & POS System
+# 🐾 Kasir-Ku
 
 [![Laravel Version](https://img.shields.io/badge/Laravel-v11-FF2D20?style=flat-square&logo=laravel)](https://laravel.com)
 [![PHP Version](https://img.shields.io/badge/PHP-v8.2-777BB4?style=flat-square&logo=php)](https://www.php.net)
-[![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
-**Kasir-Ku** (Internal Project Name: `pet_information`) adalah solusi manajemen kasir (Point of Sale) modern yang ringan, cepat, dan responsif. Dibangun dengan **Laravel 11**, aplikasi ini dirancang khusus untuk membantu pemilik toko mengelola transaksi harian, stok produk, dan laporan penjualan secara efisien.
+
+**Kasir-Ku** (Internal Project Name: `Laravel11`) adalah solusi manajemen kasir (Point of Sale) modern yang ringan, cepat, dan responsif. Dibangun dengan **Laravel 11**, aplikasi ini dirancang khusus untuk membantu pemilik toko mengelola transaksi harian, stok produk, dan laporan penjualan secara efisien.
 
 ---
 
@@ -19,7 +19,7 @@ Aplikasi ini hadir dengan berbagai fitur yang memudahkan operasional bisnis:
     * **Export Data**: Download laporan transaksi dalam format CSV untuk kebutuhan pembukuan.
 * **Manajemen Produk & Stok**: Kelola data barang dan kategori dengan antarmuka yang bersih.
 * **Timezone Synchronized**: Jam transaksi sudah disesuaikan otomatis dengan waktu lokal (WIB).
-* **Keamanan & Profil**: Sistem autentikasi yang aman untuk mengelola akses kasir dan admin.
+* **Keamanan & Profil**: Sistem autentikasi yang aman untuk mengelola akses admin.
 * **Pengaturan Toko**: Kustomisasi identitas toko (nama, alamat, dll) langsung dari dashboard.
 
 ---
