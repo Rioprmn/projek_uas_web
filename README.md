@@ -42,7 +42,7 @@ Ikuti langkah-langkah di bawah ini untuk menjalankan proyek di perangkat lokal A
 Pastikan Anda sudah menginstal **PHP 8.2**, **Composer**, dan **Node.js**.
 
 ### 2. Clone & Install
-```bash
+
 # Clone repository
 git clone [https://github.com/Rioprmn/Project_laravel_Kasir.git](https://github.com/Rioprmn/Project_laravel_Kasir.git)
 cd Project_laravel_Kasir.
@@ -71,6 +71,8 @@ Bash
 
 # Generate key aplikasi
 php artisan key:generate
+
+```bash
 
 # Migrasi tabel dan data awal
 php artisan migrate --seed
