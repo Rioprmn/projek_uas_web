@@ -19,8 +19,10 @@ RUN mkdir -p database && touch database/database.sqlite
 
 RUN composer install --no-dev --optimize-autoloader
 
-RUN chmod -R 775 storage bootstrap/cache
+RUN chmod -R 777 database storage bootstrap/cache
 
 EXPOSE 10000
 
-CMD php artisan serve --host=0.0.0.0 --port=10000
+CMD php artisan key:generate --force && \
+    php artisan migrate --force && \
+    php artisan serve --host=0.0.0.0 --port=10000
