@@ -30,12 +30,3 @@
 
 ---
 
-## ⚙️ Cara Pasang Project
-
-Ikuti instruksi di bawah ini untuk menginstal di lingkungan lokal Anda:
-
-
-### Clone repository ke folder lokal:
-```bash
-git clone [https://github.com/Rioprmn/Project_laravel_Kasir.git](https://github.com/Rioprmn/Project_laravel_Kasir.git)
-cd Project_laravel_Kasir
