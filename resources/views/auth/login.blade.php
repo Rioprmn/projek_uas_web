@@ -57,9 +57,9 @@
             </button>
         </form>
 
-        <div class="mt-10 text-center">
+        {{-- <div class="mt-10 text-center">
             <span class="text-slate-400 text-sm">Belum punya akses?</span>
             <a href="{{ route('register') }}" class="ml-1 text-sm font-black text-slate-800 hover:text-emerald-600 border-b-2 border-emerald-200 hover:border-emerald-500 transition-all">Daftar Akun</a>
-        </div>
+        </div> --}}
     </div>
 </x-guest-layout>
